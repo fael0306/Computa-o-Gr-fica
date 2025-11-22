@@ -1,7 +1,6 @@
 # Relatório do Projeto – Renderizador OBJ em OpenGL
 
-**Aluno:** Rafael Manteiga Balbino
-
+**Aluno:** Rafael Manteiga Balbino<br>
 **Matrícula:** 201920649111
 
 ## 1. Orientações para construir o executável e carregar os modelos
