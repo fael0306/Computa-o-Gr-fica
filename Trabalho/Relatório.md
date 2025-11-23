@@ -25,8 +25,6 @@ O carregamento do arquivo .obj ocorre automaticamente ao iniciar o programa, bas
 Foram carregados corretamente três modelos 3D no formato .obj:
 
 - Stanford Bunny  
-- Suzanne (Blender Monkey)  
-- Teapot  
 
 Quando necessário, a conversão foi feita no Blender:
 File → Export → Wavefront (.obj)
