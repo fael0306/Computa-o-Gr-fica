@@ -22,7 +22,7 @@ O carregamento do arquivo .obj ocorre automaticamente ao iniciar o programa, bas
 
 ## 2. Modelos utilizados com sucesso
 
-Foram carregados corretamente três modelos 3D no formato .obj:
+Foram carregados corretamente o modelo 3D no formato .obj:
 
 - Stanford Bunny  
 
