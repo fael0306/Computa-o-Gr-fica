@@ -42,10 +42,10 @@ import numpy as np # operações matemáticas e matriciais
 """Além disso, você pode usar as imagens presentes no repositório (GitHub) indicado abaixo para os exercícios ou, se quiser, pode usar outras imagens que tenha carregado para o seu Google Drive."""
 
 # Copiando as imagens do GitHub e salvando na pasta imagens_CG_UERJ, que será criada da raíz do disco virtual do Colab.
-#!git clone https://github.com/gilson-costa/imagens_CG_UERJ imagens_CG_UERJ
+!git clone https://github.com/gilson-costa/imagens_CG_UERJ imagens_CG_UERJ
 
 # Exibindo a lista de arquivos e imagens no disco virtual
-#!ls -R
+!ls -R
 
 """#**Exercício 1**
 1 - Leia uma imagem colorida (de 3 canais) e a apresente numa figura.
@@ -314,8 +314,30 @@ plt.imshow(histpareado8,cmap='gray')
 """
 
 # Lendo a imagem e acrescentando ruído, e mostrando as duas imagens
+mulher = io.imread('/content/imagens_CG_UERJ/woman.png')
+plt.figure(figsize=(12,8))
+
+mulher = mulher[:,:,0]
+
+mulherruidosp = util.random_noise(mulher,mode='s&p')
+plt.subplot(1,2,1)
+plt.imshow(mulher,cmap='gray')
+plt.subplot(1,2,2)
+plt.imshow(mulherruidosp,cmap='gray')
 
 # Aplicando filtros e mostrando as imagens resultantes
+mulherruidospmedia = ndimage.convolve(mulherruidosp,np.ones((3,3))/9)
+mulherruidospgauss = filters.gaussian(mulherruidosp, sigma=1.5)
+mulherruidospmediana = filters.rank.median(mulherruidosp)
+
+plt.figure(figsize=(12,8))
+
+plt.subplot(1,3,1)
+plt.imshow(mulherruidospmedia,cmap='gray')
+plt.subplot(1,3,2)
+plt.imshow(mulherruidospgauss,cmap='gray')
+plt.subplot(1,3,3)
+plt.imshow(mulherruidospmediana,cmap='gray')
 
 """#**Exercício 7**
 1 - Selecione uma imagem colorida qualquer e transforme-a em uma imagem monocromática.
