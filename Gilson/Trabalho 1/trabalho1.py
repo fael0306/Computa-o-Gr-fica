@@ -367,26 +367,47 @@ plt.imshow(mulherruidospmediana,cmap='gray')
 # Lendo a imagem e transformando em monocromática, suavizando a imagem monocromática, mostrando a imagem colorida e a monocromática suavizada
 
 # Carregando a imagem a ser processada
+rosaazul = io.imread('/content/imagens_CG_UERJ/rosa_azul.jpg')
+plt.figure(figsize=(12,8))
 
 # Convertendo para um canal (tons de cinza)
+rosaazul = rosaazul[:,:,0]
+rosaazulruidospgauss = filters.gaussian(rosaazul,sigma=1.5)
 
 # Exibindo as imagens
+plt.imshow(rosaazulruidospgauss,cmap='gray')
 
 # Aplicando filtros de derivação (Sobel)
 
 # Criando os filtros
+x = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
+y = np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
 
 # Calculando as derivadas parciais
+Gx = ndimage.convolve(rosaazulruidospgauss,x)
+Gy = ndimage.convolve(rosaazulruidospgauss,y)
 
-# Calculando a aplitude do Gradiente
+# Calculando a amplitude do Gradiente
+G_amp = np.sqrt(Gx**2+Gy**2)
 
 # Calculando a fase/ângulo do Gradiente
+G_ang = np.arctan2(Gy, Gx)
 
 # Exibindo as imagens Gx, Gy, G_amp, G_ang
+plt.figure(figsize=(12,8))
+plt.subplot(2,2,1)
+plt.imshow(Gx,cmap='gray')
+plt.subplot(2,2,2)
+plt.imshow(Gy,cmap='gray')
+plt.subplot(2,2,3)
+plt.imshow(G_amp,cmap='gray')
+plt.subplot(2,2,4)
+plt.imshow(G_ang,cmap='gray')
 
 # Colorindo a imagem de ângulo por faixas
 
 # entre -15o e 15o -> vermelho
+
 
 # maior que 15o -> verde
 
