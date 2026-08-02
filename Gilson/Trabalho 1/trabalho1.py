@@ -405,26 +405,50 @@ plt.subplot(2,2,4)
 plt.imshow(G_ang,cmap='gray')
 
 # Colorindo a imagem de ângulo por faixas
+G_ang = np.degrees(G_ang) % 360
+#print(rosaazul.shape) # apenas para saber o tamanho
+florcolorida = np.zeros((340,513,3),dtype=np.uint8)
+borda = G_amp>np.percentile(G_amp, 90) # pegando 10% mais fortes
 
 # entre -15o e 15o -> vermelho
-
+vermelho = ((G_ang < 15) | (G_ang > 345)) | ((G_ang > 165) & (G_ang < 195))
 
 # maior que 15o -> verde
+verde = ((G_ang > 15) & (G_ang < 75)) | ((G_ang > 195) & (G_ang < 255))
 
 # menor que 15o -> azul
+azul = ((G_ang > 105) & (G_ang < 165)) | ((G_ang > 285) & (G_ang < 345))
 
 # maior que 75o e menor que -75o -> amarelo
+amarelo = ((G_ang > 75) & (G_ang < 105)) | ((G_ang > 255) & (G_ang < 285))
 
-# maior que 105o -> azul
+florcolorida[vermelho & borda] = [255, 0, 0]
+florcolorida[amarelo & borda] = [255, 255, 0]
+florcolorida[verde & borda] = [0, 255, 0]
+florcolorida[azul & borda] = [0, 0, 255]
 
-# menor que -75o -> verde
-
-# maior que 165o e menor que -165o -> vermelho
+rosaazul = io.imread('/content/imagens_CG_UERJ/rosa_azul.jpg')
 
 # Exibindo as imagens de ângulo (tons de cinza e colorizada)
+plt.figure(figsize=(12,8))
+plt.subplot(1,3,1)
+plt.imshow(rosaazul)
+plt.subplot(1,3,2)
+plt.imshow(borda, cmap='gray')
+plt.subplot(1,3,3)
+plt.imshow(florcolorida)
 
 # Limiarizando a imagem de amplitude
+bordaamp = borda.astype(np.uint8) * 255
 
 # Limiarizando a imagem de ângulo
+bordaforte = G_ang * borda
 
 # Exibindo as imagens: original, amplitude do gradiente limiarizada, ângulo do gradiente limiarizada
+plt.figure(figsize=(12,8))
+plt.subplot(1,3,1)
+plt.imshow(rosaazul)
+plt.subplot(1,3,2)
+plt.imshow(bordaamp,cmap='gray')
+plt.subplot(1,3,3)
+plt.imshow(bordaforte)
