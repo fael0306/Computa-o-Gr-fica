@@ -1,3 +1,6 @@
+# Nome: Rafael Manteiga Balbino 
+# Matrícula: 201920649111
+
 import numpy as np
 import matplotlib.pyplot as plt
 
