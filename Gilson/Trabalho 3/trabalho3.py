@@ -34,52 +34,73 @@ def on_key(event):
     global perspective_x
     global perspective_y
     global perspective_z
+    global scale_object
+    global points
     global theta_x
     global theta_y
 
-    if event.key == 'escape':
+    if event.key == 'escape': 
         end_loop = True
-    elif event.key == '1':
+    elif event.key == '0': 
+        print('you pressed', event.key)
+    elif event.key == '1': 
+        print('you pressed', event.key)
         projection_plane = 'XY'
-    elif event.key == '2':
+    elif event.key == '2': 
+        print('you pressed', event.key)
         projection_plane = 'ZX'
-    elif event.key == '3':
+    elif event.key == '3': 
+        print('you pressed', event.key)
         projection_plane = 'ZY'
-    elif event.key == 'x':
+    elif event.key == 'x': 
+        print('you pressed', event.key)
         perspective_x = perspective_x + 0.1
-    elif event.key == 'X':
+    elif event.key == 'X': 
+        print('you pressed', event.key)
         perspective_x = perspective_x - 0.1
-    elif event.key == 'y':
+    elif event.key == 'y': 
+        print('you pressed', event.key)
         perspective_y = perspective_y + 0.1
-    elif event.key == 'Y':
+    elif event.key == 'Y': 
+        print('you pressed', event.key)
         perspective_y = perspective_y - 0.1
-    elif event.key == 'z':
+    elif event.key == 'z': 
+        print('you pressed', event.key)
         perspective_z = perspective_z + 0.1
-    elif event.key == 'Z':
+    elif event.key == 'Z': 
+        print('you pressed', event.key)
         perspective_z = perspective_z - 0.1
     elif event.key == 'up':
+        print('you pressed', event.key)
         theta_x = theta_x + 5
-    elif event.key == 'down':
+    elif event.key == 'down':  
+        print('you pressed', event.key)
         theta_x = theta_x - 5
-    elif event.key == 'left':
+    elif event.key == 'left':     
+        print('you pressed', event.key)
         theta_y = theta_y + 5
-    elif event.key == 'right':
+    elif event.key == 'right': 
+        print('you pressed', event.key)
         theta_y = theta_y - 5
-
+        
 def on_press(event):
     global scale_object
-    if event.button == 1:
+    if event.button==1: #pressed LEFT button
+        print('you pressed left mouse button', event.xdata, event.ydata)
         scale_object = scale_object * 0.5
         if scale_object < 0.1:
             scale_object = 0.1
-    elif event.button == 3:
+    elif event.button==3: #pressed RIGHT button
+        print('you pressed right mouse button', event.xdata, event.ydata)
         scale_object = scale_object * 1.5
+            
+def anima(pBack,pFront,pCeil,pFloor,pRoof,pDoor):
 
-def anima(pBack, pFront, pCeil, pFloor, pRoof, pDoor):
     if not np.array_equal(pDoor[:, -1], pDoor[:, 0]):
         pDoor = np.hstack([pDoor, pDoor[:, 0:1]])
 
-    todos = np.hstack([pBack, pFront, pCeil, pFloor, pRoof, pDoor])
+    # find house center
+    todos = np.hstack([pBack,pFront,pCeil,pFloor,pRoof,pDoor])
     min_x = np.min(todos[0, :])
     max_x = np.max(todos[0, :])
     min_y = np.min(todos[1, :])
@@ -90,22 +111,26 @@ def anima(pBack, pFront, pCeil, pFloor, pRoof, pDoor):
     centro_y = (min_y + max_y) / 2.0
     centro_z = (min_z + max_z) / 2.0
 
+    # transformation to translate center of house to origin
     T = np.eye(4)
     T[0, 3] = -centro_x
     T[1, 3] = -centro_y
     T[2, 3] = -centro_z
-
-    plt.close('all')
+    
+    # closes all existing figures
+    plt.close('all')    
     fig, ax = plt.subplots()
-    fig.canvas.mpl_connect('key_press_event', on_key)
-    fig.canvas.mpl_connect('button_press_event', on_press)
-    plt.ion()
-
+   
+    # register callback functions
+    cid = fig.canvas.mpl_connect('key_press_event', on_key)
+    cid = fig.canvas.mpl_connect('button_press_event', on_press)
+    
     partes = [pBack, pFront, pCeil, pFloor, pRoof, pDoor]
-
+    
     while not end_loop:
         ax.clear()
-
+        
+        # assemble transformation matrixes
         rad_x = np.radians(theta_x)
         rad_y = np.radians(theta_y)
 
@@ -127,7 +152,8 @@ def anima(pBack, pFront, pCeil, pFloor, pRoof, pDoor):
         P[3, 2] = perspective_z
 
         M = P @ S @ Ry @ Rx @ T
-
+        
+        # apply transformations to house points
         for parte in partes:
             q = M @ parte
             w = q[3, :]
@@ -136,6 +162,7 @@ def anima(pBack, pFront, pCeil, pFloor, pRoof, pDoor):
             y = q[1, :] / w
             z = q[2, :] / w
 
+            # plot transformed house points
             if projection_plane == 'XY':
                 u = x
                 v = y
@@ -155,10 +182,10 @@ def anima(pBack, pFront, pCeil, pFloor, pRoof, pDoor):
         ax.set_title(f"Projection Plane: {projection_plane}\n"
                      f"Rotation: X = {theta_x:.0f}; Y = {theta_y:.0f}\n"
                      f"Perspective: X = {perspective_x:.1f}; Y = {perspective_y:.1f}; Z = {perspective_z:.1f}")
+        
+        plt.draw()
         plt.pause(0.01)
 
-    plt.ioff()
-    plt.close('all')
-
-anima(pBack, pFront, pCeil, pFloor, pRoof, pDoor)
-plt.close('all')
+# execute animation
+anima(pBack,pFront,pCeil,pFloor,pRoof,pDoor)
+plt.close('all')    # Closes all existing figures
