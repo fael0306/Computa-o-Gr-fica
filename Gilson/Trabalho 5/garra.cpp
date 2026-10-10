@@ -1,7 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define PI 3.141592654
 
-#include <windows.h>
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 #include <iostream>
 #include <stdlib.h>
 #include <GL/glut.h>

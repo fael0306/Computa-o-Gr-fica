@@ -1,5 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <windows.h>
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
@@ -8,7 +10,7 @@
 
 using namespace std;
 
-char* arquivo_textura = "./metalTexture1.bmp";
+const char* arquivo_textura = "./metalTexture1.bmp";
 
 GLuint textura_id;
 GLUquadricObj *esfera;
@@ -25,10 +27,10 @@ float olhoX, olhoY, olhoZ;
 float angulo_visaoX = 0.0;
 float angulo_visaoZ = 15.0;
 
-GLuint carregarTextura(char *nome) {
+GLuint carregarTextura(const char *nome) {
     GLuint id;
     RgbImage imagem(nome);
-    
+
     if (imagem.GetNumRows() == 0) {
         printf("ERRO: Nao achei a textura %s. Vou desenhar sem textura.\n", nome);
         return 0;
@@ -53,9 +55,9 @@ void initRendering() {
     glEnable(GL_NORMALIZE);
 
     GLfloat luz_ambiente[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-    GLfloat luz_difusa[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    GLfloat posicao_luz[] = { 10.0f, 10.0f, 10.0f, 1.0f };
-    
+    GLfloat luz_difusa[]   = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat posicao_luz[]  = { 10.0f, 10.0f, 10.0f, 1.0f };
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa);
     glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
@@ -66,9 +68,9 @@ void desenhaChao() {
     glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_QUADS);
         glVertex3f(-10.0f, -10.0f, 0.0f);
-        glVertex3f(10.0f, -10.0f, 0.0f);
-        glVertex3f(10.0f, 10.0f, 0.0f);
-        glVertex3f(-10.0f, 10.0f, 0.0f);
+        glVertex3f( 10.0f, -10.0f, 0.0f);
+        glVertex3f( 10.0f,  10.0f, 0.0f);
+        glVertex3f(-10.0f,  10.0f, 0.0f);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -76,12 +78,12 @@ void desenhaChao() {
 void desenhaPerna(float posX, float posY, float angulo) {
     glPushMatrix();
         glTranslatef(posX, posY, 1.0);
-        
+
         if (posY > 0) glRotatef(-90, 0, 0, 1);
-        else glRotatef(90, 0, 0, 1);
-        
+        else          glRotatef( 90, 0, 0, 1);
+
         glRotatef(angulo, 0, 1, 0);
-        
+
         if (ligar_textura && textura_id != 0) {
             glBindTexture(GL_TEXTURE_2D, textura_id);
             gluQuadricTexture(cilindro, 1);
@@ -90,10 +92,10 @@ void desenhaPerna(float posX, float posY, float angulo) {
             glColor3f(0.3f, 0.3f, 0.3f);
         }
         gluCylinder(cilindro, 0.1, 0.05, 1.0, 10, 10);
-        
+
         glTranslatef(0, 0, 1.0);
         gluSphere(esfera, 0.1, 10, 10);
-        
+
     glPopMatrix();
 }
 
@@ -104,12 +106,12 @@ void drawScene(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    olhoX = distancia_olho * cos(angulo_visaoZ*3.1415 / 180) * cos(angulo_visaoX*3.1415 / 180);
-    olhoY = distancia_olho * cos(angulo_visaoZ*3.1415 / 180) * sin(angulo_visaoX*3.1415 / 180);
-    olhoZ = distancia_olho * sin(angulo_visaoZ*3.1415 / 180);
-    
+    olhoX = distancia_olho * cos(angulo_visaoZ*3.1415/180) * cos(angulo_visaoX*3.1415/180);
+    olhoY = distancia_olho * cos(angulo_visaoZ*3.1415/180) * sin(angulo_visaoX*3.1415/180);
+    olhoZ = distancia_olho * sin(angulo_visaoZ*3.1415/180);
+
     if (angulo_visaoZ < 90)
-        gluLookAt(olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        gluLookAt(olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 0.0,  1.0);
     else
         gluLookAt(olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0);
 
@@ -119,31 +121,31 @@ void drawScene(void) {
         glTranslatef(-1.5, 0, 1.0);
         glScalef(1.5, 1.0, 1.0);
         if (ligar_textura && textura_id != 0) gluQuadricTexture(esfera, 1);
-        else gluQuadricTexture(esfera, 0);
+        else                                  gluQuadricTexture(esfera, 0);
         gluSphere(esfera, 0.6, 20, 20);
     glPopMatrix();
 
     glPushMatrix();
         glTranslatef(0, 0, 1.0);
         if (ligar_textura && textura_id != 0) gluQuadricTexture(esfera, 1);
-        else gluQuadricTexture(esfera, 0);
+        else                                  gluQuadricTexture(esfera, 0);
         gluSphere(esfera, 0.5, 20, 20);
     glPopMatrix();
 
-    desenhaPerna(0.3, 0.4, sin(andar) * 30);
-    desenhaPerna(0.0, 0.4, sin(andar + 3.14) * 30);
-    desenhaPerna(-0.3, 0.4, sin(andar) * 30);
+    desenhaPerna( 0.3,  0.4, sin(andar)         * 30);
+    desenhaPerna( 0.0,  0.4, sin(andar + 3.14)  * 30);
+    desenhaPerna(-0.3,  0.4, sin(andar)         * 30);
 
-    desenhaPerna(0.3, -0.4, sin(andar + 3.14) * 30);
-    desenhaPerna(0.0, -0.4, sin(andar) * 30);
-    desenhaPerna(-0.3, -0.4, sin(andar + 3.14) * 30);
+    desenhaPerna( 0.3, -0.4, sin(andar + 3.14)  * 30);
+    desenhaPerna( 0.0, -0.4, sin(andar)         * 30);
+    desenhaPerna(-0.3, -0.4, sin(andar + 3.14)  * 30);
 
     glPushMatrix();
         glTranslatef(1.0, 0, 1.0);
         glRotatef(angulo_cabeca, 0, 1, 0);
 
         if (ligar_textura && textura_id != 0) gluQuadricTexture(esfera, 1);
-        else gluQuadricTexture(esfera, 0);
+        else                                  gluQuadricTexture(esfera, 0);
         gluSphere(esfera, 0.4, 20, 20);
 
         glDisable(GL_TEXTURE_2D);
@@ -159,7 +161,7 @@ void drawScene(void) {
         glEnable(GL_TEXTURE_2D);
 
         if (ligar_textura && textura_id != 0) gluQuadricTexture(cilindro, 1);
-        else gluQuadricTexture(cilindro, 0);
+        else                                  gluQuadricTexture(cilindro, 0);
 
         glPushMatrix();
             glTranslatef(0.2, 0.15, 0.3);

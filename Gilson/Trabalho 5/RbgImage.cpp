@@ -21,8 +21,10 @@
 #include "RgbImage.h"
 #define _CRT_SECURE_NO_WARNINGS
 #ifndef RGBIMAGE_DONT_USE_OPENGL
-#include <windows.h>
-#include "GL/gl.h"
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+#include <GL/gl.h>
 #endif
 
 RgbImage::RgbImage( int numRows, int numCols )
@@ -130,7 +132,7 @@ short RgbImage::readShort( FILE* infile )
 	// read a 16 bit integer
 	unsigned char lowByte, hiByte;
 	lowByte = fgetc(infile);			// Read the low order byte (little endian form)
-	hiByte = fgetc(infile);			// Read the high order byte
+	hiByte = fgetc(infile);				// Read the high order byte
 
 	// Pack together
 	short ret = hiByte;
@@ -286,6 +288,7 @@ unsigned char RgbImage::doubleToUnsignedChar( double x )
 		return (unsigned char)(x*255.0);		// Rounds down
 	}
 }
+
 // Bitmap file format  (24 bit/pixel form)		BITMAPFILEHEADER
 // Header (14 bytes)
 //	 2 bytes: "BM"
