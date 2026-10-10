@@ -1,5 +1,9 @@
 # Manual de Instruções — Formiga Robô (OpenGL)
 
+**Autores:** Rafael Manteiga Balbino e Danilo Trigo
+
+---
+
 ## 1. Descrição
 
 Este programa implementa uma formiga robô em OpenGL, com cabeça (olhos e antenas), tórax, abdômen e seis pernas. As antenas, a cabeça e as pernas se movimentam de forma independente. As pernas simulam uma caminhada (marcha de tripé). O usuário interage por teclado e mouse, podendo também controlar a câmera (zoom e pan). As partes do robô possuem textura aplicada a partir de uma imagem BMP.
