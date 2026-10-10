@@ -27,6 +27,10 @@ float olhoX, olhoY, olhoZ;
 float angulo_visaoX = 0.0;
 float angulo_visaoZ = 15.0;
 
+// offsets de pan (movem o alvo da câmera)
+float panX = 0.0;
+float panY = 0.0;
+
 GLuint carregarTextura(const char *nome) {
     GLuint id;
     RgbImage imagem(nome);
@@ -54,6 +58,10 @@ void initRendering() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
 
+    // Permite que glColor3f altere as propriedades de material
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
     GLfloat luz_ambiente[] = { 0.4f, 0.4f, 0.4f, 1.0f };
     GLfloat luz_difusa[]   = { 0.8f, 0.8f, 0.8f, 1.0f };
     GLfloat posicao_luz[]  = { 10.0f, 10.0f, 10.0f, 1.0f };
@@ -67,6 +75,7 @@ void desenhaChao() {
     glDisable(GL_TEXTURE_2D);
     glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_QUADS);
+        glNormal3f(0.0f, 0.0f, 1.0f);
         glVertex3f(-10.0f, -10.0f, 0.0f);
         glVertex3f( 10.0f, -10.0f, 0.0f);
         glVertex3f( 10.0f,  10.0f, 0.0f);
@@ -77,11 +86,14 @@ void desenhaChao() {
 
 void desenhaPerna(float posX, float posY, float angulo) {
     glPushMatrix();
-        glTranslatef(posX, posY, 1.0);
+        glTranslatef(posX, posY, 1.4);
 
-        if (posY > 0) glRotatef(-90, 0, 0, 1);
-        else          glRotatef( 90, 0, 0, 1);
+        // Aponta a perna para BAIXO e um pouco para FORA
+        // (giro em X: -160 graus aponta para +Y e -Z; +160 aponta para -Y e -Z)
+        if (posY > 0) glRotatef(-160, 1, 0, 0);
+        else          glRotatef( 160, 1, 0, 0);
 
+        // Balanço da caminhada (em torno de Y)
         glRotatef(angulo, 0, 1, 0);
 
         if (ligar_textura && textura_id != 0) {
@@ -91,9 +103,9 @@ void desenhaPerna(float posX, float posY, float angulo) {
             gluQuadricTexture(cilindro, 0);
             glColor3f(0.3f, 0.3f, 0.3f);
         }
-        gluCylinder(cilindro, 0.1, 0.05, 1.0, 10, 10);
+        gluCylinder(cilindro, 0.1, 0.05, 1.5, 10, 10);
 
-        glTranslatef(0, 0, 1.0);
+        glTranslatef(0, 0, 1.5);
         gluSphere(esfera, 0.1, 10, 10);
 
     glPopMatrix();
@@ -111,43 +123,51 @@ void drawScene(void) {
     olhoZ = distancia_olho * sin(angulo_visaoZ*3.1415/180);
 
     if (angulo_visaoZ < 90)
-        gluLookAt(olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 0.0,  1.0);
+        gluLookAt(olhoX, olhoY, olhoZ, panX, panY, 0.0, 0.0, 0.0,  1.0);
     else
-        gluLookAt(olhoX, olhoY, olhoZ, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0);
+        gluLookAt(olhoX, olhoY, olhoZ, panX, panY, 0.0, 0.0, 0.0, -1.0);
 
     desenhaChao();
 
+    // ----- ABDOMEN (atras) -----
     glPushMatrix();
-        glTranslatef(-1.5, 0, 1.0);
+        glTranslatef(-1.5, 0, 1.4);
         glScalef(1.5, 1.0, 1.0);
+        glColor3f(1.0f, 1.0f, 1.0f);
         if (ligar_textura && textura_id != 0) gluQuadricTexture(esfera, 1);
         else                                  gluQuadricTexture(esfera, 0);
         gluSphere(esfera, 0.6, 20, 20);
     glPopMatrix();
 
+    // ----- TORAX (meio, mais alto) -----
     glPushMatrix();
-        glTranslatef(0, 0, 1.0);
+        glTranslatef(0, 0, 1.5);
+        glColor3f(1.0f, 1.0f, 1.0f);
         if (ligar_textura && textura_id != 0) gluQuadricTexture(esfera, 1);
         else                                  gluQuadricTexture(esfera, 0);
         gluSphere(esfera, 0.5, 20, 20);
     glPopMatrix();
 
-    desenhaPerna( 0.3,  0.4, sin(andar)         * 30);
-    desenhaPerna( 0.0,  0.4, sin(andar + 3.14)  * 30);
-    desenhaPerna(-0.3,  0.4, sin(andar)         * 30);
+    // ----- PERNAS (3 de cada lado, marcha alternada) -----
+    desenhaPerna( 0.3,  0.4, sin(andar)        * 30);
+    desenhaPerna( 0.0,  0.4, sin(andar + 3.14) * 30);
+    desenhaPerna(-0.3,  0.4, sin(andar)        * 30);
 
-    desenhaPerna( 0.3, -0.4, sin(andar + 3.14)  * 30);
-    desenhaPerna( 0.0, -0.4, sin(andar)         * 30);
-    desenhaPerna(-0.3, -0.4, sin(andar + 3.14)  * 30);
+    desenhaPerna( 0.3, -0.4, sin(andar + 3.14) * 30);
+    desenhaPerna( 0.0, -0.4, sin(andar)        * 30);
+    desenhaPerna(-0.3, -0.4, sin(andar + 3.14) * 30);
 
+    // ----- CABECA (frente) -----
     glPushMatrix();
-        glTranslatef(1.0, 0, 1.0);
+        glTranslatef(1.0, 0, 1.4);
         glRotatef(angulo_cabeca, 0, 1, 0);
 
+        glColor3f(1.0f, 1.0f, 1.0f);
         if (ligar_textura && textura_id != 0) gluQuadricTexture(esfera, 1);
         else                                  gluQuadricTexture(esfera, 0);
         gluSphere(esfera, 0.4, 20, 20);
 
+        // Olhos (preto, sem textura)
         glDisable(GL_TEXTURE_2D);
         glColor3f(0.0f, 0.0f, 0.0f);
         glPushMatrix();
@@ -160,6 +180,8 @@ void drawScene(void) {
         glPopMatrix();
         glEnable(GL_TEXTURE_2D);
 
+        // Antenas
+        glColor3f(1.0f, 1.0f, 1.0f);
         if (ligar_textura && textura_id != 0) gluQuadricTexture(cilindro, 1);
         else                                  gluQuadricTexture(cilindro, 0);
 
@@ -213,6 +235,17 @@ void handleKeypress(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
+// ---- Pan com as setas do teclado (requisito do enunciado) ----
+void handleSpecialKeypress(int key, int x, int y) {
+    switch (key) {
+    case GLUT_KEY_LEFT:  panX -= 0.3f; break;
+    case GLUT_KEY_RIGHT: panX += 0.3f; break;
+    case GLUT_KEY_UP:    panY += 0.3f; break;
+    case GLUT_KEY_DOWN:  panY -= 0.3f; break;
+    }
+    glutPostRedisplay();
+}
+
 void handleResize(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
@@ -229,6 +262,7 @@ int main(int argc, char** argv) {
     initRendering();
     glutDisplayFunc(drawScene);
     glutKeyboardFunc(handleKeypress);
+    glutSpecialFunc(handleSpecialKeypress);   // <-- pan
     glutReshapeFunc(handleResize);
     glutTimerFunc(33, atualiza, 0);
 
