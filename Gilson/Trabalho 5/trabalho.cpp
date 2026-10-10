@@ -8,7 +8,7 @@
 
 using namespace std;
 
-char* arquivo_textura = "./metalTexture1.bmp";
+char* arquivo_textura = "./1K-metal_1-normal.jpg";
 
 GLuint textura_id;
 GLUquadricObj *esfera;
