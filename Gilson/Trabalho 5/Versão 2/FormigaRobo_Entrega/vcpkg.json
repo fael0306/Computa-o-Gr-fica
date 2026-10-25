@@ -1,0 +1,7 @@
+{
+  "name": "formiga-robo",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "freeglut"
+  ]
+}
